@@ -13,8 +13,6 @@ import {
 import { provinces } from "../data/turkeyProvinces";
 import { Reveal, T } from "./Motion";
 
-const activeSet = new Set<string>(activeProvinceIds);
-
 export function CoverageMap() {
   const { t } = useLanguage();
   const reduced = useReducedMotion();
@@ -50,22 +48,39 @@ export function CoverageMap() {
               aria-label={t.map.title}
               className="-ml-6 w-[calc(100%+3rem)] sm:ml-0 sm:w-full"
             >
-              {provinces.map((province) => {
-                const isActive = activeSet.has(province.id);
+              {/* Once tum il sinirlari; aktif olanlar bunlarin uzerine boyanir. */}
+              {provinces.map((province) => (
+                <path
+                  key={province.id}
+                  d={province.d}
+                  fill="none"
+                  stroke="var(--color-brick-darkest)"
+                  className="[stroke-width:1.4] sm:[stroke-width:0.5]"
+                  strokeLinejoin="round"
+                />
+              ))}
+
+              {/* Calisilan iller, harita ekrana girince sirayla dolar. */}
+              {activeProvinceIds.map((id, index) => {
+                const province = provinces.find((item) => item.id === id);
+                if (!province) return null;
+
                 return (
-                  <path
-                    key={province.id}
+                  <motion.path
+                    key={id}
                     d={province.d}
-                    fill={isActive ? "var(--color-brick)" : "none"}
-                    stroke={
-                      isActive ? "var(--color-brick-deep)" : "var(--color-brick-darkest)"
-                    }
-                    className={
-                      isActive
-                        ? "[stroke-width:2.5] sm:[stroke-width:0.9]"
-                        : "[stroke-width:1.4] sm:[stroke-width:0.5]"
-                    }
+                    fill="var(--color-brick)"
+                    stroke="var(--color-brick-deep)"
+                    className="[stroke-width:2.5] sm:[stroke-width:0.9]"
                     strokeLinejoin="round"
+                    initial={reduced ? { opacity: 1 } : { opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, amount: 0 }}
+                    transition={{
+                      duration: 0.55,
+                      delay: 0.2 + index * 0.14,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                   />
                 );
               })}
@@ -83,7 +98,7 @@ export function CoverageMap() {
                     initial={reduced ? { opacity: 1 } : { opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: 0.15 + index * 0.1 }}
+                    transition={{ duration: 0.5, delay: 0.55 + index * 0.1 }}
                   >
                     <line
                       x1={province.cx}

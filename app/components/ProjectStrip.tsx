@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLanguage } from "../i18n/LanguageContext";
 import { stripImages } from "../data/site";
+import { Reveal } from "./Motion";
 
 export function ProjectStrip() {
   const { t } = useLanguage();
@@ -11,7 +12,7 @@ export function ProjectStrip() {
 
   return (
     <section className="overflow-hidden border-b border-brick-deep/10 bg-bone py-10 sm:py-16">
-      <div className="kaya-marquee relative">
+      <Reveal className="kaya-marquee relative">
         <div className="kaya-marquee-track flex w-max gap-4 sm:gap-6">
           {loop.map((item, index) => (
             <figure
@@ -39,7 +40,7 @@ export function ProjectStrip() {
             </figure>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

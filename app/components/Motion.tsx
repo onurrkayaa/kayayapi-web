@@ -11,7 +11,11 @@ type RevealProps = {
   as?: "div" | "section" | "li" | "span" | "p" | "h2" | "h3";
 };
 
-/** Gorunur olunca bir kez calisan, sade yukselerek acilma. */
+/**
+ * Gorunur olunca bir kez calisan, yukselerek yerine oturma.
+ * Negatif alt `margin`, blogun ekrana bir miktar girmesini bekler; boylece animasyon
+ * kullanici oraya varmadan bitmis olmaz, bolum gozunun onunde yerlesir.
+ */
 export function Reveal({ children, className, delay = 0, as = "div" }: RevealProps) {
   const reduced = useReducedMotion();
   const Component = motion[as];
@@ -19,10 +23,10 @@ export function Reveal({ children, className, delay = 0, as = "div" }: RevealPro
   return (
     <Component
       className={className}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24 }}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 44 }}
       whileInView={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, amount: 0.15, margin: "0px 0px -12% 0px" }}
+      transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </Component>

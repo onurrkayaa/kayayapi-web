@@ -39,7 +39,12 @@ export function Hero() {
             style={
               reduced
                 ? undefined
-                : { scale: titleScale, transformOrigin: "left top" }
+                : {
+                    scale: titleScale,
+                    transformOrigin: "left top",
+                    // Kaydirmada her karede yeniden cizilmesin diye kendi katmanina alinir.
+                    willChange: "transform",
+                  }
             }
             className="mt-5 text-[3rem] font-bold uppercase leading-[1.02] tracking-tight text-brick-deep sm:text-[4.5rem] lg:text-[5.75rem]"
           >

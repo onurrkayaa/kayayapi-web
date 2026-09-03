@@ -36,12 +36,12 @@ export function SiteHeader() {
       <header
         className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
           scrolled
-            ? "border-brick-deep/10 bg-bone/95 backdrop-blur-md"
+            ? "border-brick-deep/10 bg-bone/95"
             : "border-transparent bg-bone"
         }`}
       >
         <div
-          className={`mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6 transition-all duration-500 sm:px-10 ${
+          className={`mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6 transition-[padding] duration-500 sm:px-10 ${
             scrolled ? "py-3" : "py-5"
           }`}
         >

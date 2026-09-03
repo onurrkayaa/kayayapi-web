@@ -2,11 +2,16 @@
 
 import { useEffect } from "react";
 
-/** Tekerlek hareketini yumusatan sonumleme katsayisi; kucuk deger = daha uzun sure kayar. */
-const EASE = 0.085;
+/** Tekerlegin kat ettigi mesafe carpani; 1'in altinda oldugu icin sayfa daha yavas iner. */
+const SPEED = 0.8;
+/**
+ * Her karede hedefe yaklasma orani. Yuksek deger kisa bir sonumleme kuyrugu birakir:
+ * 0.2'de bir tekerlek tiki ~0.3 sn'de oturur, tarayici tekrar bos kalir.
+ */
+const EASE = 0.2;
 
 /**
- * Fare tekerlegiyle yapilan kaydirmaya ivme kazandirir; sayfa sicramak yerine sogurulerek durur.
+ * Tekerlek hareketini yavaslatip yumusatir; sayfa sicramak yerine yerine oturur.
  * Dokunmatik cihazlar ve `prefers-reduced-motion` acikken devreye girmez.
  */
 export function SmoothScroll() {
@@ -24,23 +29,33 @@ export function SmoothScroll() {
     let current = target;
     let running = false;
     let frame = 0;
+    let limit = 0;
 
-    const maxScroll = () => root.scrollHeight - window.innerHeight;
+    /** `scrollHeight` okumak yeniden yerlesim tetikler; kare basina degil, kayis basina olculur. */
+    const measure = () => {
+      limit = root.scrollHeight - window.innerHeight;
+    };
 
     const tick = () => {
-      current += (target - current) * EASE;
-      if (Math.abs(target - current) < 0.4) {
+      const gap = target - current;
+      if (Math.abs(gap) < 0.5) {
         current = target;
         running = false;
         window.scrollTo(0, current);
         return;
       }
-      window.scrollTo(0, current);
+      current += gap * EASE;
+      // Tam sayi konum, metnin her karede yeniden puslanmasini onler.
+      window.scrollTo(0, Math.round(current));
       frame = requestAnimationFrame(tick);
     };
 
     const glideTo = (value: number) => {
-      target = Math.min(Math.max(value, 0), maxScroll());
+      if (!running) {
+        measure();
+        current = window.scrollY;
+      }
+      target = Math.min(Math.max(value, 0), limit);
       if (running) return;
       running = true;
       frame = requestAnimationFrame(tick);
@@ -54,7 +69,7 @@ export function SmoothScroll() {
       if (element?.closest?.("[data-native-scroll]")) return;
 
       event.preventDefault();
-      const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+      const delta = (event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY) * SPEED;
       glideTo((running ? target : window.scrollY) + delta);
     };
 
@@ -91,12 +106,14 @@ export function SmoothScroll() {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure, { passive: true });
     document.addEventListener("click", onClick);
 
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", measure);
       document.removeEventListener("click", onClick);
       root.style.scrollBehavior = previousBehavior;
     };
