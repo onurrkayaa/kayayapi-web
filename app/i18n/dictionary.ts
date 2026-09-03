@@ -126,6 +126,7 @@ export type Dictionary = {
     subjectLabel: string;
     messageLabel: string;
     submit: string;
+    submitting: string;
     success: string;
   };
   cta: {
@@ -472,6 +473,7 @@ export const dictionary = {
       subjectLabel: "Konu",
       messageLabel: "Mesaj",
       submit: "Gönder",
+      submitting: "Gönderiliyor…",
       success: "Mesajınız alındı. En kısa sürede size dönüş yapacağız.",
     },
     cta: {
@@ -1024,6 +1026,7 @@ export const dictionary = {
       subjectLabel: "Subject",
       messageLabel: "Message",
       submit: "Send",
+      submitting: "Sending…",
       success: "Your message has been received. We will get back to you shortly.",
     },
     cta: {

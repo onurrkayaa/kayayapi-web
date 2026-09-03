@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mail, MapPin } from "lucide-react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { Reveal, T } from "./Motion";
@@ -11,7 +11,20 @@ const fieldClass =
 
 export function ContactSection() {
   const { t } = useLanguage();
-  const [sent, setSent] = useState(false);
+  /**
+   * Formun bir sunucu ucu yok: gonderim bilerek yalnizca arayuzde canlandirilir.
+   * Yayina cikarken ya gercek bir uca baglanmali ya da form kaldirilmali.
+   */
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const timerRef = useRef<number | null>(null);
+
+  // Bekleyen zamanlayici bilesen sokulurken bosa dusmesin.
+  useEffect(
+    () => () => {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+    },
+    []
+  );
 
   const details = [
     {
@@ -90,7 +103,18 @@ export function ContactSection() {
             <form
               onSubmit={(event) => {
                 event.preventDefault();
-                setSent(true);
+                if (status === "sending") return;
+                // currentTarget iki asama sonra null olacagi icin simdi tutulur.
+                const form = event.currentTarget;
+                setStatus("sending");
+                timerRef.current = window.setTimeout(() => {
+                  form.reset();
+                  setStatus("sent");
+                }, 700);
+              }}
+              // Kullanici yeniden yazmaya baslayinca eski basari mesaji kalkar.
+              onInput={() => {
+                if (status === "sent") setStatus("idle");
               }}
               className="mt-12 flex flex-col gap-10"
             >
@@ -140,11 +164,12 @@ export function ContactSection() {
               <div className="flex flex-wrap items-center gap-6">
                 <button
                   type="submit"
-                  className="cursor-pointer bg-brick px-10 py-4 text-xs font-medium uppercase tracking-[0.2em] text-bone transition-colors hover:bg-brick-deep"
+                  disabled={status === "sending"}
+                  className="cursor-pointer bg-brick px-10 py-4 text-xs font-medium uppercase tracking-[0.2em] text-bone transition-colors hover:bg-brick-deep disabled:cursor-default disabled:opacity-60"
                 >
-                  {t.contact.submit}
+                  {status === "sending" ? t.contact.submitting : t.contact.submit}
                 </button>
-                {sent && (
+                {status === "sent" && (
                   <T as="p" className="text-sm text-brick">
                     {t.contact.success}
                   </T>
