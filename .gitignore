@@ -33,6 +33,8 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+# Yalnizca NEXT_PUBLIC_ degerleri; gizli bir sey icermez.
+!.env.production
 
 # vercel
 .vercel
@@ -46,3 +48,7 @@ next-env.d.ts
 
 # playwright mcp ciktilari
 .playwright-mcp/
+
+# opennext / cloudflare derleme ciktisi
+/.open-next/
+.wrangler/

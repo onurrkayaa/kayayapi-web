@@ -130,12 +130,19 @@ export function AskAssistant() {
 
       setError(null);
       setInput("");
+      const previous = messages;
       const history: Message[] = [...messages, { role: "user", content: trimmed }];
       setMessages(history);
       setBusy(true);
 
+      // Basarisiz gonderim gecmiste iki ard arda "user" mesaji birakirsa
+      // sunucudaki siki alternans kontrolu sonraki her istegi de reddeder;
+      // bu yuzden her hata yolunda gecmis eski haline dondurulur.
+      const rollback = () => setMessages(previous);
+
       const token = await requestToken();
       if (!token) {
+        rollback();
         setError("turnstile");
         setBusy(false);
         return;
@@ -152,6 +159,7 @@ export function AskAssistant() {
           const payload = (await response
             .json()
             .catch(() => null)) as { error?: unknown } | null;
+          rollback();
           setError(isErrorCode(payload?.error) ? payload.error : "unavailable");
           return;
         }
@@ -178,10 +186,11 @@ export function AskAssistant() {
 
         // Akis acildi ama tek karakter gelmediyse cevap uretilememis demektir.
         if (received.length === 0) {
-          setMessages((current) => current.slice(0, -1));
+          rollback();
           setError("unavailable");
         }
       } catch {
+        rollback();
         setError("network");
       } finally {
         setBusy(false);

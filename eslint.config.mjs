@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // OpenNext derleme ciktisi: uretilmis kod, lint kapsami disinda.
+    ".open-next/**",
   ]),
 ]);
 

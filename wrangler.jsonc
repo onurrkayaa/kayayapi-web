@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "kayayapi-web",
+  "compatibility_date": "2026-09-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "images": {
+    // next/image optimizasyonu Cloudflare Images uzerinden calisir.
+    "binding": "IMAGES"
+  }
+  // Gizli degerler burada DURMAZ; wrangler secret ile tanimlanir:
+  //   npx wrangler secret put GEMINI_API_KEY
+  //   npx wrangler secret put TURNSTILE_SECRET_KEY
+  // NEXT_PUBLIC_ ile baslayanlar derleme aninda pakete gomuldugu icin
+  // buraya degil .env.production dosyasina yazilir.
+}

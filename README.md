@@ -51,15 +51,35 @@ kabul edilmelidir. Asıl sınır Cloudflare panelinde kurulur:
 
 ### Ortam değişkenleri
 
-Gizli (Cloudflare'de `wrangler secret put` ya da Pages secret olarak):
-- `GEMINI_API_KEY`
-- `TURNSTILE_SECRET_KEY`
+Değerler üç yere ayrılır ve bu ayrım isteğe bağlı değil:
 
-Genel (normal ortam değişkeni):
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
-- `NEXT_PUBLIC_SITE_URL` — üretimde gerçek alan adı olmalıdır. Origin
-  kontrolü bu değerden hem apex hem `www` biçimini türetir; yanlış olursa
-  asistan `forbidden` döner.
+| Nerede | Ne | Neden |
+| --- | --- | --- |
+| `.env.development.local` (repoda değil) | `GEMINI_API_KEY`, `TURNSTILE_SECRET_KEY` | Yalnızca `npm run dev` okur. `.env.local`'da **durmamalı**: OpenNext derleme sırasında `.env.local`'ı okuyup içindeki her değeri Worker paketine yazıyor. |
+| `.env.production` (repoda) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_SITE_URL` | `NEXT_PUBLIC_` değerleri derleme anında pakete gömülür; gizli değildir. |
+| `wrangler secret put` | `GEMINI_API_KEY`, `TURNSTILE_SECRET_KEY` | Üretimde gizli değerlerin tek kaynağı. |
+
+`NEXT_PUBLIC_SITE_URL` yerelde **tanımlanmaz**. Next `.env.local`'a
+`.env.production`'dan daha yüksek öncelik verir; yerelde `localhost` yazarsanız
+üretim derlemesine de o girer ve Origin kontrolü canlıda her isteği `403`'ler.
+Geliştirmede `localhost` zaten ayrıca kabul ediliyor.
+
+### Cloudflare'e dağıtım
+
+```bash
+npx wrangler login
+npx wrangler secret put GEMINI_API_KEY
+npx wrangler secret put TURNSTILE_SECRET_KEY
+npm run deploy
+```
+
+`npm run preview` aynı paketi yerelde Workers çalışma zamanında açar.
+
+Her iki komut da derlemeden sonra `scripts/strip-build-env.mjs` çalıştırır.
+Bu adım gereklidir: OpenNext `.open-next/cloudflare/next-env.mjs` dosyasına
+`production`, `development` ve `test` bloklarını birlikte yazar, dosya Worker'ın
+içine girer ve `development` bloğu yerel gizli değerleri taşır. Betik üretim
+dışı blokları boşaltır, böylece pakete hiçbir gizli değer girmez.
 
 ### Turnstile
 

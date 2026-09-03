@@ -11,6 +11,11 @@ import { buildSystemInstruction, wrapUserText } from "./knowledge";
 
 const MODEL = "gemini-flash-latest";
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse`;
+/**
+ * Yalnizca baglanti ve ilk yanit icin sure siniri. Akis basladiktan sonra
+ * saat durdurulur: AbortSignal.timeout govde akarken de isledigi icin uzun
+ * cevaplar cumlenin ortasinda kesiliyordu.
+ */
 const UPSTREAM_TIMEOUT_MS = 20_000;
 
 /**
@@ -96,6 +101,9 @@ export async function streamAnswer(
     ],
   }));
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
   let upstream: Response;
   try {
     upstream = await fetch(ENDPOINT, {
@@ -110,11 +118,14 @@ export async function streamAnswer(
         contents,
         generationConfig: GENERATION_CONFIG,
       }),
-      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+      signal: controller.signal,
     });
   } catch (error) {
     console.error("gemini cagrisi basarisiz", error);
     return null;
+  } finally {
+    // Yanit basliklari geldi: bundan sonrasi akis, sure siniri disinda.
+    clearTimeout(timer);
   }
 
   if (!upstream.ok || !upstream.body) {
