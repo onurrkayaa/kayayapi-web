@@ -290,6 +290,8 @@ export function checkRateLimit(
  * Cloudflare Turnstile token dogrulamasi. Secret yoksa uc nokta hizmet vermez;
  * dogrulanamayan token (ag hatasi dahil) kabul edilmez.
  */
+let missingSecretLogged = false;
+
 export async function verifyTurnstile(
   token: string,
   ip: string
@@ -298,8 +300,13 @@ export async function verifyTurnstile(
   if (!secret) {
     // Yanit opak kalir (503); ancak loglarda bunun bir bot degil bir
     // yapilandirma hatasi oldugu ayirt edilebilsin. Secret veya kullanici
-    // mesaji asla loglanmaz.
-    console.error("TURNSTILE_SECRET_KEY tanimli degil, /api/chat devre disi.");
+    // mesaji asla loglanmaz. Bu statik bir yapilandirma hatasidir, istek
+    // basina degil surec basina bir kez loglanir; aksi halde secret'siz bir
+    // ortamda her anonim istek log hacmini attirmak icin kullanilabilir.
+    if (!missingSecretLogged) {
+      missingSecretLogged = true;
+      console.error("TURNSTILE_SECRET_KEY tanimli degil, /api/chat devre disi.");
+    }
     return { code: "unavailable", status: 503 };
   }
 
@@ -313,7 +320,11 @@ export async function verifyTurnstile(
     );
     const result = (await response.json()) as { success?: boolean };
     return result.success === true ? null : FORBIDDEN;
-  } catch {
+  } catch (error) {
+    // Ag hatasi, timeout veya bozuk yanit: hepsi burada yakalanir. Bu olay
+    // basina gercek bir sinyaldir (yapilandirma hatasi degil), her seferinde
+    // loglanir. Secret veya kullanici mesaji asla loglanmaz; sadece hata.
+    console.error("turnstile dogrulamasi basarisiz", error);
     return FORBIDDEN;
   }
 }
