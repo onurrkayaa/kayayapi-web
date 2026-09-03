@@ -123,11 +123,15 @@ BİLGİ
 ${knowledge[locale]}`;
 }
 
+const OPEN_PATTERN = new RegExp(USER_OPEN, "gi");
+const CLOSE_PATTERN = new RegExp(USER_CLOSE, "gi");
+
 /**
- * Kullanici metnini ayrac icine alir. Ayraci taklit eden girdiler once temizlenir;
- * boylece ziyaretci ayraci kapatip talimat blogunun icine gecemez.
+ * Kullanici metnini ayrac icine alir. Ayraci taklit eden girdiler once temizlenir
+ * (buyuk-kucuk harften bagimsiz); boylece ziyaretci ayraci kapatip talimat
+ * blogunun icine gecemez.
  */
 export function wrapUserText(text: string): string {
-  const cleaned = text.split(USER_OPEN).join("").split(USER_CLOSE).join("");
+  const cleaned = text.replace(OPEN_PATTERN, "").replace(CLOSE_PATTERN, "");
   return `${USER_OPEN}\n${cleaned}\n${USER_CLOSE}`;
 }
