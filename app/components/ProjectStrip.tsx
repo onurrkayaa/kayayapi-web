@@ -25,6 +25,8 @@ export function ProjectStrip() {
                   alt={`${item.name} — ${item.type}`}
                   fill
                   sizes="(max-width: 640px) 280px, 360px"
+                  // Telefonda hero gorseli gizli oldugu icin LCP bu karedir.
+                  priority={index === 0}
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
                 <div className="absolute inset-0 bg-brick-deep/10 transition-opacity duration-500 group-hover:opacity-0" />
