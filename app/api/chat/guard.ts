@@ -7,6 +7,7 @@
  */
 
 import type { Locale } from "../../i18n/dictionary";
+import { siteUrl } from "../../data/site";
 
 export type ChatRole = "user" | "model";
 export type ChatMessage = { role: ChatRole; content: string };
@@ -30,7 +31,12 @@ export type GuardFailure = {
 export const LIMITS = {
   /** Govde en fazla 8 KB. */
   bodyBytes: 8 * 1024,
-  /** Gecmis dahil en fazla 8 mesaj. */
+  /**
+   * Gecmis dahil en fazla 8 mesaj. Siki alternans (user/model/user/...) ve
+   * son mesajin kullanicidan olma sarti nedeniyle bu deger her zaman cift
+   * sayida reddedilir; etkin sinir fiilen 7'dir (uc onceki degisim + yeni
+   * soru). Spesifikasyon degeri 8 olarak sabit tutulur.
+   */
   maxMessages: 8,
   /** Tek mesaj en fazla 1000 karakter. */
   maxMessageChars: 1000,
@@ -48,9 +54,23 @@ const FORBIDDEN: GuardFailure = { code: "forbidden", status: 403 };
 /* ------------------------------------------------------------------ Origin */
 
 function allowedOrigins(): string[] {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL;
+  // Tek kaynak app/data/site.ts'teki siteUrl; env bos kalsa bile orada bir
+  // uretim yedegi var, bu yuzden yanlislikla tum uc noktayi 403'lemeyiz.
+  // Apex ve www ayni siteye isaret eder (yonlendirme hangi yonde olursa
+  // olsun); bu yuzden ikisi de kabul edilir.
   const list: string[] = [];
-  if (configured) list.push(configured.replace(/\/+$/, ""));
+  try {
+    const parsed = new URL(siteUrl);
+    list.push(parsed.origin);
+    const counterpartHost = parsed.hostname.startsWith("www.")
+      ? parsed.hostname.slice(4)
+      : `www.${parsed.hostname}`;
+    const port = parsed.port ? `:${parsed.port}` : "";
+    list.push(`${parsed.protocol}//${counterpartHost}${port}`);
+  } catch {
+    // siteUrl gecersizse uretim listesi bos kalir: uc nokta acik degil
+    // kapali kapiyla basarisiz olur.
+  }
   if (process.env.NODE_ENV !== "production") {
     list.push("http://localhost:3000", "http://127.0.0.1:3000");
   }
@@ -190,11 +210,25 @@ export function parseChatRequest(raw: string): ChatRequest | GuardFailure {
  * Bellek ici kayan pencere. Cloudflare Workers'ta sayac izolasyon basina ayridir,
  * bu yuzden best-effort kabul edilir; asil sinir Cloudflare WAF kuralindadir
  * (Security > WAF > Rate limiting rules, http.request.uri.path eq "/api/chat").
+ * Bu limitin bir anlam tasimasi icin clientIp'nin yalnizca Cloudflare'in
+ * kendisinin yazdigi basliga guvenmesi sarttir; asagiya bakin.
  */
 const hits = new Map<string, number[]>();
 
+/**
+ * IP adresini production'da yalnizca cf-connecting-ip'den okur: bu baslik
+ * istemci degil Cloudflare edge'i tarafindan atanir, bu yuzden sahtesi
+ * yazilamaz. x-forwarded-for ise siradan bir istek basligidir ve herhangi
+ * bir istemci istedigi degeri yazabilir; bu depoda Cloudflare Workers
+ * yayin katmani (@opennextjs/cloudflare, wrangler.*) henuz kurulu degil,
+ * yani bu basligi guvenilir sanmak hiz sinirini tamamen atlatilabilir kilar.
+ * production disinda (yerel gelistirme icin) eski zincire geri donulur.
+ */
 export function clientIp(request: Request): string {
   const cf = request.headers.get("cf-connecting-ip");
+  if (process.env.NODE_ENV === "production") {
+    return cf ?? "unknown";
+  }
   if (cf) return cf;
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
@@ -231,9 +265,15 @@ export function checkRateLimit(
   }
 
   recent.push(now);
+  // Once sil sonra ekle: Map var olan bir anahtari set ile guncellerken
+  // sirasini korur, biz ise dokunulan IP'yi sona tasiyip gercek bir LRU
+  // elde etmek istiyoruz. Aksi halde uzun sureli, duzenli ziyaretciler en
+  // eski (ilk eklenen) konumda kalir ve tahliyede once onlar silinir.
+  hits.delete(ip);
   hits.set(ip, recent);
 
-  // Sinirsiz buyumeyi engelle: Map ekleme sirasini korur, en eskiler atilir.
+  // Sinirsiz buyumeyi engelle: en uzun suredir dokunulmamis (en bastaki)
+  // girdiler atilir.
   if (hits.size > LIMITS.rateLimitEntries) {
     for (const key of hits.keys()) {
       hits.delete(key);
@@ -255,7 +295,13 @@ export async function verifyTurnstile(
   ip: string
 ): Promise<GuardFailure | null> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return { code: "unavailable", status: 503 };
+  if (!secret) {
+    // Yanit opak kalir (503); ancak loglarda bunun bir bot degil bir
+    // yapilandirma hatasi oldugu ayirt edilebilsin. Secret veya kullanici
+    // mesaji asla loglanmaz.
+    console.error("TURNSTILE_SECRET_KEY tanimli degil, /api/chat devre disi.");
+    return { code: "unavailable", status: 503 };
+  }
 
   const form = new URLSearchParams({ secret, response: token });
   if (ip !== "unknown") form.set("remoteip", ip);
