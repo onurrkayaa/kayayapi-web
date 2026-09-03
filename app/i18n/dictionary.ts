@@ -6,7 +6,6 @@ type NavLink = { label: string; href: string };
 type Titled = { title: string; description: string };
 type Stat = { value: string; label: string };
 type StripItem = { name: string; type: string };
-type FaqItem = { question: string; answer: string };
 type DesignStep = { title: string; description: string };
 
 type ProjectCopy = {
@@ -134,11 +133,6 @@ export type Dictionary = {
     description: string;
     button: string;
     imageAlt: string;
-  };
-  faq: {
-    title: string;
-    description: string;
-    items: FaqItem[];
   };
   assistant: {
     eyebrow: string;
@@ -486,37 +480,6 @@ export const dictionary = {
         "Arsanızı, ihtiyacınızı ve bütçenizi anlatın; 5 iş günü içinde bir yol haritasıyla dönelim.",
       button: "İletişime geçin",
       imageAlt: "Gün ışığında iş binası cephesi",
-    },
-    faq: {
-      title: "S.S.S.",
-      description: "En çok sorulanlar.",
-      items: [
-        {
-          question: "Anahtar teslim çalışıyor musunuz?",
-          answer:
-            "Evet. Ruhsat, kaba yapı, ince yapı, peyzaj ve iskân dahil tüm süreci tek sözleşmeyle üstleniyoruz. İsterseniz yalnızca belirli bir etabı da yapabiliriz.",
-        },
-        {
-          question: "Fiyat nasıl belirleniyor?",
-          answer:
-            "Ön görüşmenin ardından mahal listesi ve metraja dayalı bir keşif hazırlıyoruz. Sözleşmedeki fiyat sabittir; yalnızca sizin talep ettiğiniz değişiklikler farka konu olur.",
-        },
-        {
-          question: "Bir proje ne kadar sürer?",
-          answer:
-            "Müstakil bir ev ortalama 10-14 ay, iç mekân yenilemeleri 2-4 ay sürer. Kesin süre iş programında gün gün yazılır ve sözleşmeye eklenir.",
-        },
-        {
-          question: "Hangi illerde iş alıyorsunuz?",
-          answer:
-            "İstanbul, Tekirdağ, Antalya, Muğla ve Adıyaman'da kendi ekibimizle çalışıyoruz. Diğer iller için proje bazında değerlendirme yapıyoruz.",
-        },
-        {
-          question: "Kendi mimarımla çalışabilir miyim?",
-          answer:
-            "Elbette. Mevcut projenizi teknik olarak inceleyip uygulama ekibi olarak devam edebiliriz; gerekirse kendi mimari ekibimizle birlikte revize ederiz.",
-        },
-      ],
     },
     assistant: {
       eyebrow: "Yapay zekâ asistanı",
@@ -1069,37 +1032,6 @@ export const dictionary = {
         "Tell us about your plot, your brief and your budget; we will come back within 5 working days with a road map.",
       button: "Get in touch",
       imageAlt: "Office building facade in daylight",
-    },
-    faq: {
-      title: "FAQ",
-      description: "The questions we hear most.",
-      items: [
-        {
-          question: "Do you work turnkey?",
-          answer:
-            "Yes. Permits, structure, finishes, landscaping and occupancy are covered by a single contract. We can also take on just one phase if you prefer.",
-        },
-        {
-          question: "How is the price determined?",
-          answer:
-            "After the first meeting we prepare an estimate based on a room schedule and quantities. The contract price is fixed; only changes you request affect it.",
-        },
-        {
-          question: "How long does a project take?",
-          answer:
-            "A detached house takes 10-14 months on average, interior renovations 2-4 months. The exact duration is written day by day into the schedule and annexed to the contract.",
-        },
-        {
-          question: "Which provinces do you take work in?",
-          answer:
-            "We work with our own teams in Istanbul, Tekirdağ, Antalya, Muğla and Adıyaman. Other provinces are assessed project by project.",
-        },
-        {
-          question: "Can I work with my own architect?",
-          answer:
-            "Of course. We can review your existing design technically and continue as the construction team, revising it together with our architects where needed.",
-        },
-      ],
     },
     assistant: {
       eyebrow: "AI assistant",

@@ -1,7 +1,7 @@
 import { Advantages } from "./components/Advantages";
+import { AskAssistant } from "./components/AskAssistant";
 import { CoverageMap } from "./components/CoverageMap";
 import { CtaBanner } from "./components/CtaBanner";
-import { Faq } from "./components/Faq";
 import { Hero } from "./components/Hero";
 import { Manifesto } from "./components/Manifesto";
 import { ProjectStrip } from "./components/ProjectStrip";
@@ -19,7 +19,7 @@ export default function Home() {
       <Advantages />
       <CoverageMap />
       <CtaBanner />
-      <Faq />
+      <AskAssistant />
     </>
   );
 }
