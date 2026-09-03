@@ -5,7 +5,7 @@
 
 /** Site adresi ve iletisim adresi tek yerde tutulur. */
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kayayapimimarlik.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://kayayapimimarlik.com";
 export const contactEmail = "info@kayayapimimarlik.com";
 
 /** Unsplash kaynak genisligi: buyuk sahneler icin genis, kucuk kartlar icin dar. */
