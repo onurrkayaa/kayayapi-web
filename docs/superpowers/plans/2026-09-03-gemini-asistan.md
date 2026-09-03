@@ -21,6 +21,10 @@
 - **Sır kuralı.** `GEMINI_API_KEY` ve `TURNSTILE_SECRET_KEY` asla `NEXT_PUBLIC_` ön eki almaz ve yalnızca `app/api/chat/` altında okunur. Değerler `.env.local` içindedir (gitignored) ve commit edilmez.
 - **Yorum dili.** Mevcut kod tabanında kod yorumları ASCII'ye sadeleştirilmiş Türkçe ile yazılır (`// Gorunur olunca calisan...`); kullanıcıya görünen metinler tam Türkçe karakterlerle yazılır. Bu ayrım korunur.
 - **Model çıktısı düz metindir.** İstemcide markdown veya HTML render edilmez, `dangerouslySetInnerHTML` kullanılmaz.
+- **Geçici doğrulama betikleri depo dışında durur.** `tsconfig.json`'un `include` listesi `**/*.ts` ve `**/*.mts` içerdiği ve `moduleResolution` `"bundler"` olduğu için, depo içine konan bir betiğin `.ts` uzantılı import'u `npx tsc --noEmit` komutunu kırar. Bu yüzden betikler şu dizine yazılır ve oradan çalıştırılır:
+  `/private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad`
+  İçlerinden depoya mutlak yolla import edilir, örneğin `import { ... } from "/Users/onurkaya/Desktop/claude_projeler/insaat/kayayapi-web/app/api/chat/guard.ts";`
+  Çalıştırma: `node --experimental-strip-types <betik yolu>` (Node 24 tipleri doğrudan siler, ek bağımlılık gerekmez).
 - **Dal:** `feat/gemini-asistan`. Her görev kendi commit'iyle biter.
 
 ---
@@ -233,7 +237,7 @@ git commit -m "feat(i18n): asistan arayuz metinleri ve yasal metin ekleri"
 ## Task 2: Bilgi tabanı ve system instruction
 
 **Files:**
-- Create: `check-knowledge.ts` (gecici dogrulama betigi, gorev sonunda silinir)
+- Create: `/private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-knowledge.ts` (gecici dogrulama betigi, depo disinda, gorev sonunda silinir)
 - Create: `app/api/chat/knowledge.ts`
 
 **Interfaces:**
@@ -386,11 +390,11 @@ export function wrapUserText(text: string): string {
 
 - [ ] **Step 2: Ayraç temizliğinin ve talimatın çalıştığını doğrula**
 
-Depo kökünde `check-knowledge.ts` oluştur (Node 24 TypeScript'i doğrudan çalıştırır, ek bağımlılık gerekmez):
+Betiği **depo dışında**, `/private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-knowledge.ts` olarak oluştur (Global Constraints'teki kural):
 
 ```ts
-/** Gecici dogrulama betigi. Calistirma: node --experimental-strip-types check-knowledge.ts */
-import { buildSystemInstruction, wrapUserText } from "./app/api/chat/knowledge.ts";
+/** Gecici dogrulama betigi — depo disinda durur, tsc kapsamina girmez. */
+import { buildSystemInstruction, wrapUserText } from "/Users/onurkaya/Desktop/claude_projeler/insaat/kayayapi-web/app/api/chat/knowledge.ts";
 
 let failures = 0;
 function check(label: string, condition: boolean) {
@@ -434,7 +438,7 @@ console.log(failures === 0 ? "TUM DENETIMLER GECTI" : `${failures} DENETIM BASAR
 process.exit(failures === 0 ? 0 : 1);
 ```
 
-Run: `node --experimental-strip-types check-knowledge.ts`
+Run: `node --experimental-strip-types /private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-knowledge.ts`
 Expected: her satır `ok`, son satır `TUM DENETIMLER GECTI`, çıkış kodu 0.
 
 En kritik iki satır ilk ikisidir: saldırgan metin ayracı kapatmaya çalışsa bile açılış ve kapanış sayısı 1'de kalır, yani ziyaretçi talimat bloğunun içine geçemez.
@@ -447,7 +451,7 @@ Expected: çıktı boş.
 - [ ] **Step 4: Commit**
 
 ```bash
-rm -f check-knowledge.ts
+rm -f /private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-knowledge.ts
 git add app/api/chat/knowledge.ts
 git commit -m "feat(chat): system instruction ve kurumsal bilgi tabani"
 ```
@@ -457,7 +461,7 @@ git commit -m "feat(chat): system instruction ve kurumsal bilgi tabani"
 ## Task 3: İstek denetimleri (guard)
 
 **Files:**
-- Create: `check-guard.ts` (gecici dogrulama betigi, gorev sonunda silinir)
+- Create: `/private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-guard.ts` (gecici dogrulama betigi, depo disinda, gorev sonunda silinir)
 - Create: `app/api/chat/guard.ts`
 
 **Interfaces:**
@@ -481,20 +485,22 @@ Bu görevde önce doğrulama betiği yazılır, çalıştırılıp başarısız 
 
 - [ ] **Step 1: Doğrulama betiğini yaz**
 
-Depo kökünde `check-guard.ts` dosyasını oluştur:
+Betiği **depo dışında**, `/private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-guard.ts` olarak oluştur (Global Constraints'teki kural):
 
 ```ts
-/** Gecici dogrulama betigi. Calistirma: node --experimental-strip-types check-guard.ts */
-process.env.NODE_ENV = "development";
-process.env.NEXT_PUBLIC_SITE_URL = "https://www.kayayapimimarlik.com";
-
+/** Gecici dogrulama betigi — depo disinda durur, tsc kapsamina girmez. */
 import {
   checkOrigin,
   checkRateLimit,
   clientIp,
   parseChatRequest,
   readLimitedBody,
-} from "./app/api/chat/guard.ts";
+} from "/Users/onurkaya/Desktop/claude_projeler/insaat/kayayapi-web/app/api/chat/guard.ts";
+
+// ESM import'lari hoist edildigi icin env atamasi import'lardan SONRA yazilir;
+// guard.ts env'i modul yuklenirken degil, fonksiyon cagrilirken okur.
+process.env.NODE_ENV = "development";
+process.env.NEXT_PUBLIC_SITE_URL = "https://www.kayayapimimarlik.com";
 
 let failures = 0;
 
@@ -788,7 +794,7 @@ process.exit(failures === 0 ? 0 : 1);
 
 - [ ] **Step 2: Betiği çalıştır ve başarısız olduğunu gör**
 
-Run: `node --experimental-strip-types check-guard.ts`
+Run: `node --experimental-strip-types /private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-guard.ts`
 Expected: `Cannot find module` benzeri bir hata — `app/api/chat/guard.ts` henüz yok.
 
 - [ ] **Step 3: `guard.ts` dosyasını oluştur**
@@ -1073,7 +1079,7 @@ export async function verifyTurnstile(
 
 - [ ] **Step 4: Betiği çalıştır ve geçtiğini gör**
 
-Run: `node --experimental-strip-types check-guard.ts`
+Run: `node --experimental-strip-types /private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-guard.ts`
 Expected: her satır `ok` ile başlar ve son satır `TUM DENETIMLER GECTI`, çıkış kodu 0.
 
 Başarısız satır varsa `guard.ts` içindeki ilgili kuralı düzelt; betiği değiştirme.
@@ -1083,12 +1089,12 @@ Başarısız satır varsa `guard.ts` içindeki ilgili kuralı düzelt; betiği d
 Run: `npx tsc --noEmit && npm run lint`
 Expected: her ikisi de hatasız.
 
-`check-guard.ts` kök dizinde durduğu için `tsc` onu da derler; `readLimitedBody` çağrılarındaki top-level `await` nedeniyle hata verirse betiği `tsconfig.json`'un `exclude` listesine eklemek yerine doğrudan sil ve bu adımı tekrarla (betiğin görevi Step 4'te tamamlandı).
+Betik depo dışında durduğu için `tsc` onu görmez; her ikisi de yalnızca `app/` altındaki gerçek kodu denetler.
 
 - [ ] **Step 6: Betiği sil ve commit**
 
 ```bash
-rm -f check-guard.ts
+rm -f /private/tmp/claude-501/-Users-onurkaya-Desktop-claude-projeler-insaat-kayayapi-web/761a04a2-db5d-42f0-8b45-7d59f5527147/scratchpad/check-guard.ts
 git add app/api/chat/guard.ts
 git commit -m "feat(chat): origin, govde, sema, hiz siniri ve turnstile denetimleri"
 ```
