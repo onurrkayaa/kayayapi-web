@@ -11,7 +11,9 @@
   "images": {
     // next/image optimizasyonu Cloudflare Images uzerinden calisir.
     "binding": "IMAGES"
-  }
+  },
+  // Kanonik adres apex; www icin Cloudflare tarafinda yonlendirme kurali var.
+  "routes": [{ "pattern": "kayayapimimarlik.com", "custom_domain": true }]
   // Gizli degerler burada DURMAZ; wrangler secret ile tanimlanir:
   //   npx wrangler secret put GEMINI_API_KEY
   //   npx wrangler secret put TURNSTILE_SECRET_KEY

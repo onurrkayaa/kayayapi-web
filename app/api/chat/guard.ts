@@ -318,8 +318,15 @@ export async function verifyTurnstile(
       "https://challenges.cloudflare.com/turnstile/v0/siteverify",
       { method: "POST", body: form, signal: AbortSignal.timeout(8_000) }
     );
-    const result = (await response.json()) as { success?: boolean };
-    return result.success === true ? null : FORBIDDEN;
+    const result = (await response.json()) as {
+      success?: boolean;
+      "error-codes"?: string[];
+    };
+    if (result.success === true) return null;
+    // Yalnizca Cloudflare'in kod listesi loglanir: anahtar-secret uyusmazligini
+    // bot trafiginden ayirt etmenin tek yolu bu. Token ve secret asla loglanmaz.
+    console.error("turnstile reddetti", result["error-codes"] ?? []);
+    return FORBIDDEN;
   } catch (error) {
     // Ag hatasi, timeout veya bozuk yanit: hepsi burada yakalanir. Bu olay
     // basina gercek bir sinyaldir (yapilandirma hatasi degil), her seferinde
