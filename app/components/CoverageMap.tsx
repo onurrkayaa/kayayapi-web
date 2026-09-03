@@ -13,6 +13,12 @@ import {
 import { provinces } from "../data/turkeyProvinces";
 import { Reveal, T } from "./Motion";
 
+/** Sarmalayicidan devralinan tek gorunurluk durumu. */
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
 export function CoverageMap() {
   const { t } = useLanguage();
   const reduced = useReducedMotion();
@@ -42,103 +48,111 @@ export function CoverageMap() {
 
         <div className="mt-10 grid gap-12 sm:mt-14 lg:grid-cols-[1.75fr_1fr] lg:gap-16">
           <Reveal>
-            <svg
-              viewBox={mapViewBox}
-              role="img"
-              aria-label={t.map.title}
-              className="-ml-6 w-[calc(100%+3rem)] sm:ml-0 sm:w-full"
+            {/*
+             * Gorunurluk tetigi bilerek bu HTML sarmalayicida durur: iOS Safari
+             * IntersectionObserver'i SVG alt elemanlarinda guvenilir
+             * calistirmadigi icin, tetik <path> uzerindeyken aktif iller
+             * telefonda hic dolmuyordu. Cocuklar durumu variant ile devralir.
+             */}
+            <motion.div
+              initial={reduced ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
             >
-              {/* Once tum il sinirlari; aktif olanlar bunlarin uzerine boyanir. */}
-              {provinces.map((province) => (
-                <path
-                  key={province.id}
-                  d={province.d}
-                  fill="none"
-                  stroke="var(--color-brick-darkest)"
-                  className="[stroke-width:1.4] sm:[stroke-width:0.5]"
-                  strokeLinejoin="round"
-                />
-              ))}
-
-              {/* Calisilan iller, harita ekrana girince sirayla dolar. */}
-              {activeProvinceIds.map((id, index) => {
-                const province = provinces.find((item) => item.id === id);
-                if (!province) return null;
-
-                return (
-                  <motion.path
-                    key={id}
+              <svg
+                viewBox={mapViewBox}
+                role="img"
+                aria-label={t.map.title}
+                className="-ml-6 w-[calc(100%+3rem)] sm:ml-0 sm:w-full"
+              >
+                {/* Once tum il sinirlari; aktif olanlar bunlarin uzerine boyanir. */}
+                {provinces.map((province) => (
+                  <path
+                    key={province.id}
                     d={province.d}
-                    fill="var(--color-brick)"
-                    stroke="var(--color-brick-deep)"
-                    className="[stroke-width:2.5] sm:[stroke-width:0.9]"
+                    fill="none"
+                    stroke="var(--color-brick-darkest)"
+                    className="[stroke-width:1.4] sm:[stroke-width:0.5]"
                     strokeLinejoin="round"
-                    initial={reduced ? { opacity: 1 } : { opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true, amount: 0 }}
-                    transition={{
-                      duration: 0.55,
-                      delay: 0.2 + index * 0.14,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
                   />
-                );
-              })}
+                ))}
 
-              <g className="hidden sm:block">
+                {/* Calisilan iller, harita ekrana girince sirayla dolar. */}
                 {activeProvinceIds.map((id, index) => {
-                const province = provinces.find((item) => item.id === id);
-                if (!province) return null;
-                const label = provinceLabels[id as ActiveProvinceId];
-                const labelX = label.labelX ?? province.cx;
+                  const province = provinces.find((item) => item.id === id);
+                  if (!province) return null;
 
-                return (
-                  <motion.g
-                    key={id}
-                    initial={reduced ? { opacity: 1 } : { opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: 0.55 + index * 0.1 }}
-                  >
-                    <line
-                      x1={province.cx}
-                      y1={province.cy}
-                      x2={province.cx}
-                      y2={label.toY + 6}
+                  return (
+                    <motion.path
+                      key={id}
+                      d={province.d}
+                      fill="var(--color-brick)"
                       stroke="var(--color-brick-deep)"
-                      strokeWidth={1}
+                      className="[stroke-width:2.5] sm:[stroke-width:0.9]"
+                      strokeLinejoin="round"
+                      variants={fadeIn}
+                      transition={{
+                        duration: 0.55,
+                        delay: 0.2 + index * 0.14,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
                     />
-                    <path
-                      d={`M${province.cx},${label.toY} l4,7 h-8 Z`}
-                      fill="var(--color-brick-deep)"
-                    />
-                    <text
-                      x={labelX}
-                      y={label.toY - 6}
-                      textAnchor={label.anchor}
-                      stroke="var(--color-bone)"
-                      strokeWidth={4}
-                      paintOrder="stroke"
-                      className="fill-brick-deep text-[13px] font-semibold uppercase tracking-[0.12em]"
-                    >
-                      {cityLabels[id]}
-                    </text>
-                  </motion.g>
-                );
+                  );
                 })}
-              </g>
-            </svg>
 
-            <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-2 sm:hidden">
-              {activeProvinceIds.map((id) => (
-                <li
-                  key={id}
-                  className="text-[11px] font-medium uppercase tracking-[0.22em] text-brick"
-                >
-                  {cityLabels[id]}
-                </li>
-              ))}
-            </ul>
+                <g className="hidden sm:block">
+                  {activeProvinceIds.map((id, index) => {
+                  const province = provinces.find((item) => item.id === id);
+                  if (!province) return null;
+                  const label = provinceLabels[id as ActiveProvinceId];
+                  const labelX = label.labelX ?? province.cx;
+
+                  return (
+                    <motion.g
+                      key={id}
+                      variants={fadeIn}
+                      transition={{ duration: 0.5, delay: 0.55 + index * 0.1 }}
+                    >
+                      <line
+                        x1={province.cx}
+                        y1={province.cy}
+                        x2={province.cx}
+                        y2={label.toY + 6}
+                        stroke="var(--color-brick-deep)"
+                        strokeWidth={1}
+                      />
+                      <path
+                        d={`M${province.cx},${label.toY} l4,7 h-8 Z`}
+                        fill="var(--color-brick-deep)"
+                      />
+                      <text
+                        x={labelX}
+                        y={label.toY - 6}
+                        textAnchor={label.anchor}
+                        stroke="var(--color-bone)"
+                        strokeWidth={4}
+                        paintOrder="stroke"
+                        className="fill-brick-deep text-[13px] font-semibold uppercase tracking-[0.12em]"
+                      >
+                        {cityLabels[id]}
+                      </text>
+                    </motion.g>
+                  );
+                  })}
+                </g>
+              </svg>
+
+              <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-2 sm:hidden">
+                {activeProvinceIds.map((id) => (
+                  <li
+                    key={id}
+                    className="text-[11px] font-medium uppercase tracking-[0.22em] text-brick"
+                  >
+                    {cityLabels[id]}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </Reveal>
 
           <Reveal delay={0.1} className="flex flex-col justify-center gap-10">
