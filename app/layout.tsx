@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { SmoothScroll } from "./components/SmoothScroll";
+import { gaMeasurementId } from "./data/site";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import "./globals.css";
 
@@ -36,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteFooter />
         </LanguageProvider>
       </body>
+      <GoogleAnalytics gaId={gaMeasurementId} />
     </html>
   );
 }

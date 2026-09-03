@@ -8,6 +8,9 @@ export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://kayayapimimarlik.com";
 export const contactEmail = "info@kayayapimimarlik.com";
 
+/** Google Analytics 4 olcum kimligi; gizli degildir, tarayiciya iner. */
+export const gaMeasurementId = "G-F4WX6QBKGF";
+
 /** Unsplash kaynak genisligi: buyuk sahneler icin genis, kucuk kartlar icin dar. */
 const photo = (id: string, width: 1200 | 1600 | 2400 = 1600) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=80`;

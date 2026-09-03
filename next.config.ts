@@ -3,16 +3,16 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV !== "production";
 
 /**
- * Turnstile widget'i disinda tum dis kaynaklar kapali.
+ * Turnstile, Cloudflare Web Analytics ve Google Analytics disinda tum dis kaynaklar kapali.
  * Gelistirmede Next'in HMR websocket'i ve derleyicisi icin iki istisna eklenir.
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://images.unsplash.com",
+  "img-src 'self' data: https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com",
   "font-src 'self' data:",
-  `connect-src 'self'${isDev ? " ws: http://localhost:3000" : ""} https://challenges.cloudflare.com`,
+  `connect-src 'self'${isDev ? " ws: http://localhost:3000" : ""} https://challenges.cloudflare.com https://cloudflareinsights.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com`,
   "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "object-src 'none'",
