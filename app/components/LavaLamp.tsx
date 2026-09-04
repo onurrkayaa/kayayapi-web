@@ -22,6 +22,19 @@ const blobs = [
   { size: 36, left: 44, bottom: -4, rise: -170, drift: -12, duration: 24, delay: -13 },
 ];
 
+/**
+ * Lambanin cevreye vurdugu isik. Dipteki ampulun sicak cekirdegi, cam boyunca
+ * sonen hale, zemine dusen yayilma ve genis ortam isigi ust uste biner.
+ * Her katman kendi kenarindan once saydama indigi icin kutu sinirinda cizgi
+ * olusmaz; renkler ember/brick-light/brick tonlaridir.
+ */
+const glow = [
+  "radial-gradient(ellipse 24% 10% at 50% 86%, rgba(224,102,63,0.52), rgba(224,102,63,0) 74%)",
+  "radial-gradient(ellipse 34% 30% at 50% 58%, rgba(196,82,63,0.30), rgba(196,82,63,0) 76%)",
+  "radial-gradient(ellipse 46% 5% at 50% 96%, rgba(224,102,63,0.34), rgba(224,102,63,0) 78%)",
+  "radial-gradient(ellipse 78% 42% at 50% 74%, rgba(139,58,47,0.16), rgba(139,58,47,0) 74%)",
+].join(", ");
+
 export function LavaLamp() {
   const { t } = useLanguage();
 
@@ -32,8 +45,11 @@ export function LavaLamp() {
       className="relative flex h-full w-full items-center justify-center"
     >
       <div className="relative flex h-full max-h-[620px] flex-col aspect-[1/2.8]">
-        {/* Ampulun odadaki isigi */}
-        <div className="pointer-events-none absolute -inset-x-[75%] -inset-y-[8%] bg-[radial-gradient(ellipse_at_50%_74%,rgba(196,82,63,0.30),rgba(196,82,63,0.10)_34%,rgba(196,82,63,0)_58%)]" />
+        {/* Lambanin cevreye vurdugu isik */}
+        <div
+          className="kaya-lava-glow pointer-events-none absolute -inset-x-[100%] -bottom-[4%] -top-[8%]"
+          style={{ backgroundImage: glow }}
+        />
 
         {/* Ust kapak */}
         <div

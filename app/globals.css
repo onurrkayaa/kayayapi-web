@@ -97,6 +97,22 @@ body {
   will-change: transform;
 }
 
+/* Cevreye vuran isik, lav hareket ettikce hafifce nefes alir. */
+@keyframes kaya-lava-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.kaya-lava-glow {
+  animation: kaya-lava-glow 13s ease-in-out infinite;
+  will-change: opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -104,7 +120,8 @@ body {
 
   .kaya-marquee-track,
   .kaya-lava-blob,
-  .kaya-lava-pool {
+  .kaya-lava-pool,
+  .kaya-lava-glow {
     animation: none;
   }
 }
