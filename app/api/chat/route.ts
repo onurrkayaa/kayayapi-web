@@ -15,6 +15,7 @@ import {
   type GuardFailure,
 } from "./guard";
 import { streamAnswer } from "./gemini";
+import { cloudflare, parseAgent, sessionId, visitorId } from "../../lib/analytics";
 
 // Istek basligina ve govdeye bagli oldugu icin onbelleklenemez.
 export const dynamic = "force-dynamic";
@@ -35,6 +36,40 @@ function fail(failure: GuardFailure): Response {
   });
 }
 
+/**
+ * Sorulan soruyu, olcumdekiyle ayni oturum ve ziyaretci kimligine baglayarak
+ * D1'e yazar. Yanit akisini bekletmez; yazma basarisiz olursa sohbet etkilenmez.
+ */
+async function logQuestion(
+  request: Request,
+  ip: string,
+  question: string,
+  locale: string
+): Promise<void> {
+  const context = await cloudflare();
+  const db = context?.env.ANALYTICS;
+  const salt = process.env.ANALYTICS_SALT;
+  if (!context || !db || !salt) return;
+
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const [id, visitor] = await Promise.all([
+    sessionId(ip, userAgent, salt),
+    visitorId(ip, parseAgent(userAgent), salt),
+  ]);
+  context.ctx.waitUntil(
+    db
+      .prepare(
+        `INSERT INTO chat_questions (session_id, visitor_id, asked_at, locale, question)
+         VALUES (?, ?, ?, ?, ?)`
+      )
+      .bind(id, visitor, Date.now(), locale, question.slice(0, 1000))
+      .run()
+      .catch((error: unknown) => {
+        console.error("soru kaydedilemedi", error);
+      })
+  );
+}
+
 export async function POST(request: Request): Promise<Response> {
   const originFailure = checkOrigin(request);
   if (originFailure) return fail(originFailure);
@@ -53,6 +88,13 @@ export async function POST(request: Request): Promise<Response> {
 
   const turnstileFailure = await verifyTurnstile(parsed.turnstileToken, ip);
   if (turnstileFailure) return fail(turnstileFailure);
+
+  await logQuestion(
+    request,
+    ip,
+    parsed.messages[parsed.messages.length - 1].content,
+    parsed.locale
+  );
 
   const stream = await streamAnswer(parsed.messages, parsed.locale);
   if (!stream) return fail({ code: "unavailable", status: 503 });

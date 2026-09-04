@@ -53,7 +53,7 @@ const FORBIDDEN: GuardFailure = { code: "forbidden", status: 403 };
 
 /* ------------------------------------------------------------------ Origin */
 
-function allowedOrigins(): string[] {
+export function allowedOrigins(): string[] {
   // Tek kaynak app/data/site.ts'teki siteUrl; env bos kalsa bile orada bir
   // uretim yedegi var, bu yuzden yanlislikla tum uc noktayi 403'lemeyiz.
   // Apex ve www ayni siteye isaret eder (yonlendirme hangi yonde olursa

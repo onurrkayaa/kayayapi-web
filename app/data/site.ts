@@ -15,8 +15,6 @@ export const gaMeasurementId = "G-F4WX6QBKGF";
 const photo = (id: string, width: 1200 | 1600 | 2400 = 1600) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=80`;
 
-export const heroImage = photo("1607963546003-e59b11fe7f23", 2400);
-
 /** Ana sayfadaki surekli akan serit — konum bilgisi tasimaz, tasarim gorselleridir. */
 export const stripImages = [
   photo("1613152161890-52aa17add7c9", 1200),

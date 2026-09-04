@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { LegalDocument } from "../components/LegalDocument";
-import { PageHero } from "../components/PageHero";
+import { LegalDocument } from "../../components/LegalDocument";
+import { PageHero } from "../../components/PageHero";
 
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni — Kaya Yapı",

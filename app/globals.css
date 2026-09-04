@@ -12,6 +12,7 @@
   --color-brick-light: #c4523f;
   --color-brick-darkest: #2c100b;
   --color-bone-soft: #e7ddcc;
+  --color-brick-ember: #e0663f;
 
   --color-background: var(--color-bone);
   --color-foreground: var(--color-brick-deep);
@@ -58,12 +59,52 @@ body {
   animation-play-state: paused;
 }
 
+/* Lav lambasi: damlalar yukselip iner, dipteki lav golu hafifce nefes alir.
+   Yalnizca transform animasyonlanir. */
+@keyframes kaya-lava-rise {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1);
+  }
+  12% {
+    transform: translate3d(0, 0, 0) scale(1.08, 0.92);
+  }
+  50%,
+  60% {
+    transform: translate3d(var(--kaya-drift, 0), var(--kaya-rise, -500%), 0) scale(0.86, 1.08);
+  }
+}
+
+@keyframes kaya-lava-pool {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.05, 0.88);
+  }
+}
+
+.kaya-lava-blob {
+  animation-name: kaya-lava-rise;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.kaya-lava-pool {
+  animation: kaya-lava-pool 9s ease-in-out infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .kaya-marquee-track {
+  .kaya-marquee-track,
+  .kaya-lava-blob,
+  .kaya-lava-pool {
     animation: none;
   }
 }

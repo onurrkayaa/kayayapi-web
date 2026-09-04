@@ -1,10 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "../i18n/LanguageContext";
-import { heroImage } from "../data/site";
+import { LavaLamp } from "./LavaLamp";
 import { T } from "./Motion";
 
 export function Hero() {
@@ -34,6 +33,10 @@ export function Hero() {
               {t.hero.eyebrow}
             </T>
           </motion.div>
+
+          <div className="float-right ml-4 mb-2 h-[230px] w-[84px] sm:h-[300px] sm:w-[110px] lg:hidden">
+            <LavaLamp />
+          </div>
 
           <motion.h1
             style={
@@ -66,19 +69,9 @@ export function Hero() {
           initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="relative hidden w-full overflow-hidden lg:block lg:aspect-auto lg:h-full lg:min-h-[480px]"
+          className="relative hidden w-full lg:block lg:h-full lg:min-h-[620px] lg:p-6"
         >
-          <Image
-            src={heroImage}
-            alt={t.hero.imageAlt}
-            fill
-            sizes="(max-width: 1024px) 100vw, 45vw"
-            loading="eager"
-            fetchPriority="high"
-            className="object-cover object-[70%_62%]"
-          />
-          <div className="absolute inset-0 bg-brick/15 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-brick-deep/40 to-transparent" />
+          <LavaLamp />
         </motion.div>
       </div>
     </section>

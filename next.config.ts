@@ -37,6 +37,14 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           { key: "Content-Security-Policy", value: contentSecurityPolicy },
+          // Tarayicidan ek cihaz ayrintilari istenir (Android'de kesin model,
+          // Windows 10/11 ayrimi, islemci mimarisi). Ziyaretciye hicbir sey
+          // sorulmaz; basliklar bir sonraki istekten itibaren gelir.
+          {
+            key: "Accept-CH",
+            value:
+              "Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Arch, Sec-CH-UA-Bitness",
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },

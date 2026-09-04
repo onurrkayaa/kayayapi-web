@@ -12,11 +12,23 @@
     // next/image optimizasyonu Cloudflare Images uzerinden calisir.
     "binding": "IMAGES"
   },
+  // Cerezsiz ziyaretci olcumu; sema db/schema.sql icinde.
+  //   npx wrangler d1 create kayayapi-analitik
+  //   npx wrangler d1 execute kayayapi-analitik --remote --file=db/schema.sql
+  "d1_databases": [
+    {
+      "binding": "ANALYTICS",
+      "database_name": "kayayapi-analitik",
+      "database_id": "1946286c-49f5-4d1e-9a0b-af73db9045c6"
+    }
+  ],
   // Kanonik adres apex; www icin Cloudflare tarafinda yonlendirme kurali var.
   "routes": [{ "pattern": "kayayapimimarlik.com", "custom_domain": true }]
   // Gizli degerler burada DURMAZ; wrangler secret ile tanimlanir:
   //   npx wrangler secret put GEMINI_API_KEY
   //   npx wrangler secret put TURNSTILE_SECRET_KEY
+  //   npx wrangler secret put ANALYTICS_SALT
+  //   npx wrangler secret put ADMIN_PATH
   // NEXT_PUBLIC_ ile baslayanlar derleme aninda pakete gomuldugu icin
   // buraya degil .env.production dosyasina yazilir.
 }

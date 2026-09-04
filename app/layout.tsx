@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SiteFooter } from "./components/SiteFooter";
-import { SiteHeader } from "./components/SiteHeader";
-import { SmoothScroll } from "./components/SmoothScroll";
 import { gaMeasurementId } from "./data/site";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import "./globals.css";
@@ -19,26 +16,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kayayapimimarlik.com"),
+  applicationName: "Kaya Yapı Mimarlık",
   title: "Kaya Yapı — İnşaat, Mimari ve Taahhüt",
   description:
     "Konut ve iş binaları, müstakil ev ve peyzaj uygulamaları ile anahtar teslim taahhüt. İstanbul, Tekirdağ, Antalya, Muğla ve Adıyaman'da aktif.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Kaya Yapı Mimarlık",
+    alternateName: ["Kaya Yapı", "Kaya Yapı & Mimarlık"],
+    url: "https://kayayapimimarlik.com",
+  };
+
   return (
     <html
       lang="tr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <LanguageProvider>
-          <SmoothScroll />
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </LanguageProvider>
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
       <GoogleAnalytics gaId={gaMeasurementId} />
     </html>
   );
-}
+} 

@@ -52,3 +52,5 @@ next-env.d.ts
 # opennext / cloudflare derleme ciktisi
 /.open-next/
 .wrangler/
+# wrangler dev'in yerel gizli degerleri
+.dev.vars

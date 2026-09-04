@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CtaBanner } from "../../components/CtaBanner";
-import { PageHero } from "../../components/PageHero";
-import { ProjectDetail } from "../../components/ProjectDetail";
-import { projectIds, type ProjectId } from "../../data/site";
-import { dictionary } from "../../i18n/dictionary";
+import { CtaBanner } from "../../../components/CtaBanner";
+import { PageHero } from "../../../components/PageHero";
+import { ProjectDetail } from "../../../components/ProjectDetail";
+import { projectIds, type ProjectId } from "../../../data/site";
+import { dictionary } from "../../../i18n/dictionary";
 
 export function generateStaticParams() {
   return projectIds.map((slug) => ({ slug }));

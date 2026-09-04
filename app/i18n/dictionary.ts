@@ -50,7 +50,7 @@ export type Dictionary = {
     titleLine2: string;
     titleLine3: string;
     description: string;
-    imageAlt: string;
+    lampLabel: string;
   };
   strip: {
     items: StripItem[];
@@ -194,7 +194,7 @@ export const dictionary = {
       titleLine3: "Kalıcı Değer.",
       description:
         "Konut ve iş binalarından müstakil evlere, peyzaj düzenlemesinden anahtar teslim taahhüde kadar; projeyi ilk çizgisinden son detayına biz üstleniyoruz.",
-      imageAlt: "Akşam ışığında modern iş binası cephesi",
+      lampLabel: "Damlaları ağır ağır yükselip alçalan lav lambası",
     },
     strip: {
       items: [
@@ -762,7 +762,7 @@ export const dictionary = {
       titleLine3: "Lasting Value.",
       description:
         "From housing and office buildings to detached homes, landscaping and turnkey contracting — we own the project from the first line to the final detail.",
-      imageAlt: "Modern office building facade in evening light",
+      lampLabel: "A lava lamp whose blobs slowly rise and fall",
     },
     strip: {
       items: [

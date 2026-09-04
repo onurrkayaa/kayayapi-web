@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { CtaBanner } from "../components/CtaBanner";
-import { PageHero } from "../components/PageHero";
-import { ProjectsGrid } from "../components/ProjectsGrid";
+import { CtaBanner } from "../../components/CtaBanner";
+import { PageHero } from "../../components/PageHero";
+import { ProjectsGrid } from "../../components/ProjectsGrid";
 
 export const metadata: Metadata = {
   title: "Projeler — Kaya Yapı",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ContactSection } from "../components/ContactSection";
-import { PageHero } from "../components/PageHero";
+import { ContactSection } from "../../components/ContactSection";
+import { PageHero } from "../../components/PageHero";
 
 export const metadata: Metadata = {
   title: "İletişim — Kaya Yapı",
