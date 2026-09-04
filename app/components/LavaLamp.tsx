@@ -23,16 +23,25 @@ const blobs = [
 ];
 
 /**
- * Lambanin cevreye vurdugu isik. Dipteki ampulun sicak cekirdegi, cam boyunca
- * sonen hale, zemine dusen yayilma ve genis ortam isigi ust uste biner.
- * Her katman kendi kenarindan once saydama indigi icin kutu sinirinda cizgi
- * olusmaz; renkler ember/brick-light/brick tonlaridir.
+ * Lambanin cevreye vurdugu isik. Ampulun sicak cekirdegi, cam boyunca sonen
+ * hale, yukari uzanan ince sutun, zemine dusen yayilma ve genis ortam isigi
+ * ust uste biner; ara duraklar gecisi yumusatir.
+ *
+ * Her katmanin yaricapi, saydama indigi durak ile carpildiginda kutunun yari
+ * olcusunu gecmemelidir; aksi halde degrade kutu kenarinda kesilir ve gorunur
+ * bir sinir birakir.
  */
 const glow = [
-  "radial-gradient(ellipse 24% 10% at 50% 86%, rgba(224,102,63,0.52), rgba(224,102,63,0) 74%)",
-  "radial-gradient(ellipse 34% 30% at 50% 58%, rgba(196,82,63,0.30), rgba(196,82,63,0) 76%)",
-  "radial-gradient(ellipse 46% 5% at 50% 96%, rgba(224,102,63,0.34), rgba(224,102,63,0) 78%)",
-  "radial-gradient(ellipse 78% 42% at 50% 74%, rgba(139,58,47,0.16), rgba(139,58,47,0) 74%)",
+  // Ampul: en parlak, en dar cekirdek.
+  "radial-gradient(ellipse 19% 7% at 50% 80%, rgba(224,102,63,0.80), rgba(224,102,63,0.36) 40%, rgba(224,102,63,0) 86%)",
+  // Cam boyunca sonen hale.
+  "radial-gradient(ellipse 25% 25% at 50% 60%, rgba(196,82,63,0.55), rgba(196,82,63,0.22) 45%, rgba(196,82,63,0) 82%)",
+  // Zemine dusen yayilma.
+  "radial-gradient(ellipse 40% 5% at 50% 88%, rgba(224,102,63,0.55), rgba(224,102,63,0.20) 48%, rgba(224,102,63,0) 88%)",
+  // Yukari dogru uzanan ince sutun.
+  "radial-gradient(ellipse 21% 44% at 50% 56%, rgba(196,82,63,0.28), rgba(196,82,63,0.11) 45%, rgba(196,82,63,0) 88%)",
+  // Genis ortam isigi.
+  "radial-gradient(ellipse 48% 30% at 50% 72%, rgba(139,58,47,0.38), rgba(139,58,47,0.15) 46%, rgba(139,58,47,0) 90%)",
 ].join(", ");
 
 export function LavaLamp() {
@@ -47,7 +56,7 @@ export function LavaLamp() {
       <div className="relative flex h-full max-h-[620px] flex-col aspect-[1/2.8]">
         {/* Lambanin cevreye vurdugu isik */}
         <div
-          className="kaya-lava-glow pointer-events-none absolute -inset-x-[100%] -bottom-[4%] -top-[8%]"
+          className="kaya-lava-glow pointer-events-none absolute -inset-x-[140%] -bottom-[16%] -top-[22%]"
           style={{ backgroundImage: glow }}
         />
 
